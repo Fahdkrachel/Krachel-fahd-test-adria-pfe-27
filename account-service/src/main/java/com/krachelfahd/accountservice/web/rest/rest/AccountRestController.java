@@ -1,4 +1,4 @@
-package com.krachelfahd.accountservice.web.rest;
+package com.krachelfahd.accountservice.web.rest.rest;
 
 import com.krachelfahd.accountservice.domain.Account;
 import com.krachelfahd.accountservice.domain.AccountStatus;
