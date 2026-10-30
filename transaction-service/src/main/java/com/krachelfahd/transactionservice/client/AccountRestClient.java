@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
+
 @FeignClient(name = "account-service", url = "http://localhost:8056")
 public interface AccountRestClient {
     @GetMapping("/accounts/{id}")
     @CircuitBreaker(name = "account-service", fallbackMethod = "accountFallback")
-    AccountDTO findAccountById(@PathVariable String id);
+    AccountDTO findAccountById(@PathVariable UUID id);
 
     @PutMapping("/accounts/{id}/balance")
     @CircuitBreaker(name = "account-service", fallbackMethod = "balanceFallback")
-    AccountDTO updateBalance(@PathVariable String id, @RequestBody BalanceUpdateRequest request);
+    AccountDTO updateBalance(@PathVariable UUID id, @RequestBody BalanceUpdateRequest request);
 
-    default AccountDTO accountFallback(String id, Exception exception) {
+    default AccountDTO accountFallback(UUID id, Exception exception) {
         // pour afficher aux administrateurs l'exception
         exception.printStackTrace();
         if (exception instanceof FeignException.NotFound) {
@@ -32,7 +34,7 @@ public interface AccountRestClient {
                 "Account-Service indisponible, veuillez reessayer plus tard");
     }
 
-    default AccountDTO balanceFallback(String id, BalanceUpdateRequest request, Exception exception) {
+    default AccountDTO balanceFallback(UUID id, BalanceUpdateRequest request, Exception exception) {
         exception.printStackTrace();
         throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                 "Account-Service indisponible : le solde n'a pas pu etre mis a jour");
